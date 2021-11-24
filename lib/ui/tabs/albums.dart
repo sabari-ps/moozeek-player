@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:moozeek_player/helpers/hivebox.dart';
+import 'package:moozeek_player/main.dart';
 import 'package:moozeek_player/models/boxmodels.dart';
 import 'package:moozeek_player/ui/screens/albumview.dart';
 import 'package:on_audio_query/on_audio_query.dart';
@@ -52,7 +52,7 @@ class _AlbumsTabState extends State<AlbumsTab> {
         ),
         (searchingTerm.isEmpty)
             ? ValueListenableBuilder<Box<AlbumsBoxModel>>(
-                valueListenable: HiveHelper.getAlbums().listenable(),
+                valueListenable: hiveCtrl.getAlbums().listenable(),
                 builder: (context, box, _) {
                   final albums = box.values.toList().cast<AlbumsBoxModel>();
                   if (albums.isEmpty) {
@@ -64,7 +64,7 @@ class _AlbumsTabState extends State<AlbumsTab> {
                   }
                   return Expanded(
                     child: RefreshIndicator(
-                      onRefresh: HiveHelper.fetchAllAlbums,
+                      onRefresh: hiveCtrl.fetchAllAlbums,
                       child: ListView.builder(
                         itemCount: albums.length,
                         itemBuilder: (context, index) {
@@ -121,7 +121,7 @@ class _AlbumsTabState extends State<AlbumsTab> {
                 },
               )
             : ValueListenableBuilder<Box<AlbumsBoxModel>>(
-                valueListenable: HiveHelper.getAlbums().listenable(),
+                valueListenable: hiveCtrl.getAlbums().listenable(),
                 builder: (context, box, _) {
                   final filtered = box.values
                       .where(

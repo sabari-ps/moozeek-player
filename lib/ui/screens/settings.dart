@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:moozeek_player/helpers/sharedpref.dart';
+import 'package:moozeek_player/main.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -28,9 +28,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void initState() {
     super.initState();
     if (mounted) {
-      notificationOn = SharedPreferencesHelper.sharedPreferences
-              .getBool('notificationStatus') ??
-          true;
+      notificationOn = permissionCtrl.storage.read('notification') ?? true;
     }
   }
 
@@ -76,12 +74,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 activeColor: Colors.deepPurple,
                 value: notificationOn,
                 onChanged: (value) async {
-                  notificationOn = await SharedPreferencesHelper
-                      .sharedPreferences
-                      .setBool('notificationStatus', value);
+                  await permissionCtrl.storage.write('notification', value);
                   setState(() {
-                    notificationOn = SharedPreferencesHelper.sharedPreferences
-                        .getBool('notificationStatus')!;
+                    notificationOn = value;
                   });
                 }),
           ),

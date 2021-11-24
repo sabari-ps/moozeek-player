@@ -1,4 +1,7 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:moozeek_player/main.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 
@@ -10,40 +13,35 @@ class PlayerScreen extends StatefulWidget {
 }
 
 class _PlayerScreenState extends State<PlayerScreen> {
-  bool isPlaying = false;
-  String songTitle = "UNKNOWN TITLE";
-  String songArtists = "UNKNOWN ARTISTS";
-  bool notificationStatus = false;
-  int songId = 0;
-  bool isShuffling = false;
-
   @override
   void initState() {
     super.initState();
-    audioPlayerHelper.isAudioPlayerPlaying.listen((value) {
+    playerCtrl.isAudioPlayerPlaying.listen((value) {
       if (mounted) {
         setState(() {
-          isPlaying = value;
+          playerCtrl.isPlaying.value = value;
         });
-        print("Status set to: $isPlaying");
+        print("Status set to: ${playerCtrl.isPlaying.value}");
       }
     });
 
-    audioPlayerHelper.shuffleStatus.listen((value) {
+    playerCtrl.shuffleStatus.listen((value) {
       if (mounted) {
         setState(() {
-          isShuffling = value;
+          playerCtrl.isShuffling.value = value;
         });
       }
     });
-    audioPlayerHelper.currentStatus.listen((current) {
+    playerCtrl.currentStatus.listen((current) {
       if (mounted) {
         if (current == null) {
           return;
         } else {
-          songTitle = current.audio.audio.metas.title ?? "UNKNOWN TITLE";
-          songArtists = current.audio.audio.metas.artist ?? "UNKNOWN ARTISTS";
-          songId = int.parse(current.audio.audio.metas.id!);
+          playerCtrl.songTitle.value =
+              current.audio.audio.metas.title ?? "UNKNOWN TITLE";
+          playerCtrl.songArtists.value =
+              current.audio.audio.metas.artist ?? "UNKNOWN ARTISTS";
+          playerCtrl.songId.value = int.parse(current.audio.audio.metas.id!);
         }
       }
     });
@@ -58,7 +56,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
         leading: BackButton(
           color: Colors.black,
           onPressed: () {
-            Navigator.of(context).pop();
+            Get.back();
           },
         ),
         title: const Text(
@@ -77,132 +75,110 @@ class _PlayerScreenState extends State<PlayerScreen> {
           horizontal: 16.0,
           vertical: 12.0,
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            QueryArtworkWidget(
-              id: songId,
-              type: ArtworkType.AUDIO,
-              artworkWidth: 300.0,
-              artworkHeight: 300.0,
-              nullArtworkWidget: Image.asset(
-                "assets/images/no_album_art.png",
-                width: 300.0,
-                height: 300.0,
-              ),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  songTitle.toUpperCase(),
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 14.0,
-                    letterSpacing: 2.0,
-                    fontWeight: FontWeight.bold,
-                  ),
+        child: Obx(
+          () => Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              QueryArtworkWidget(
+                id: playerCtrl.songId.value,
+                type: ArtworkType.AUDIO,
+                artworkWidth: 300.0,
+                artworkHeight: 300.0,
+                nullArtworkWidget: Image.asset(
+                  "assets/images/no_album_art.png",
+                  width: 300.0,
+                  height: 300.0,
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 8.0,
-                  ),
-                  child: Text(
-                    songArtists.toUpperCase(),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    playerCtrl.songTitle.value.toUpperCase(),
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,
                     style: const TextStyle(
-                      fontSize: 12.0,
+                      fontSize: 14.0,
                       letterSpacing: 2.0,
-                      color: Colors.black54,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                ),
-                audioPlayerHelper.seekBarWidget(context),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    audioPlayerHelper.previousButton(),
-                    IconButton(
-                      onPressed: () {
-                        audioPlayerHelper.seekSongBackward();
-                      },
-                      icon: const Icon(
-                        Icons.fast_rewind,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 8.0,
+                    ),
+                    child: Text(
+                      playerCtrl.songArtists.value.toUpperCase(),
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 12.0,
+                        letterSpacing: 2.0,
+                        color: Colors.black54,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                    IconButton(
-                      onPressed: () {
-                        audioPlayerHelper.playPauseAudio();
-                      },
-                      icon: (!isPlaying)
-                          ? const Icon(
-                              Icons.play_arrow,
-                            )
-                          : const Icon(
-                              Icons.pause,
-                            ),
-                    ),
-                    IconButton(
-                      onPressed: () {
-                        audioPlayerHelper.seekSongForward();
-                      },
-                      icon: const Icon(
-                        Icons.fast_forward,
+                  ),
+                  playerCtrl.seekBarWidget(context),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      playerCtrl.previousButton(),
+                      IconButton(
+                        onPressed: () {
+                          playerCtrl.seekSongBackward();
+                        },
+                        icon: const Icon(
+                          Icons.fast_rewind,
+                        ),
                       ),
-                    ),
-                    audioPlayerHelper.nextButton(),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    // IconButton(
-                    //   onPressed: () {
-                    //     if (HiveHelper.getSongsBox().get(songId)!.isFavorite ==
-                    //         true) {
-                    //       HiveHelper.removeFromFavorites(songId, context);
-                    //     } else {
-                    //       HiveHelper.addToFavorites(songId, context);
-                    //     }
-                    //   },
-                    //   icon: (HiveHelper.getSongsBox().get(songId)?.isFavorite ==
-                    //           true)
-                    //       ? const Icon(
-                    //           Icons.favorite,
-                    //         )
-                    //       : const Icon(
-                    //           Icons.favorite_border,
-                    //         ),
-                    // ),
-                    // IconButton(
-                    //   onPressed: () {},
-                    //   icon: const Icon(
-                    //     Icons.playlist_add,
-                    //   ),
-                    // ),
-                    audioPlayerHelper.repeatIcon(),
-                    IconButton(
-                      onPressed: () async {
-                        await audioPlayerHelper.shufflePlaylist();
-                      },
-                      icon: (isShuffling)
-                          ? const Icon(
-                              Icons.shuffle,
-                            )
-                          : const Icon(
-                              Icons.shuffle,
-                              color: Colors.grey,
-                            ),
-                    ),
-                  ],
-                )
-              ],
-            ),
-          ],
+                      IconButton(
+                        onPressed: () {
+                          playerCtrl.playPauseAudio();
+                        },
+                        icon: (!playerCtrl.isPlaying.value)
+                            ? const Icon(
+                                Icons.play_arrow,
+                              )
+                            : const Icon(
+                                Icons.pause,
+                              ),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          playerCtrl.seekSongForward();
+                        },
+                        icon: const Icon(
+                          Icons.fast_forward,
+                        ),
+                      ),
+                      playerCtrl.nextButton(),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      playerCtrl.repeatIcon(),
+                      IconButton(
+                        onPressed: () async {
+                          await playerCtrl.shufflePlaylist();
+                        },
+                        icon: (playerCtrl.isShuffling.isTrue)
+                            ? const Icon(
+                                Icons.shuffle,
+                              )
+                            : const Icon(
+                                Icons.shuffle,
+                                color: Colors.grey,
+                              ),
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

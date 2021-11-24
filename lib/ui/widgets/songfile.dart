@@ -1,7 +1,7 @@
 import 'dart:typed_data';
+import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:moozeek_player/helpers/hivebox.dart';
 import 'package:moozeek_player/main.dart';
 import 'package:moozeek_player/models/boxmodels.dart';
 import 'package:moozeek_player/ui/screens/player_screen.dart';
@@ -20,7 +20,7 @@ class SongFile extends StatelessWidget {
   final bool isFavorite;
   final String? searchTerm;
   final String? playlistName;
-  SongFile({
+  const SongFile({
     Key? key,
     required this.audioType,
     required this.isFavorite,
@@ -92,48 +92,27 @@ class SongFile extends StatelessWidget {
               ),
         onTap: () async {
           if (audioType == 0) {
-            await audioPlayerHelper.initializeInitialPlaylist();
-            await audioPlayerHelper.playSongAtIndex(songIndex);
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => const PlayerScreen(),
-              ),
-            );
+            await playerCtrl.initializeInitialPlaylist();
+            await playerCtrl.playSongAtIndex(songIndex);
+            routesCtrl.toPlayerScreen();
           } else if (audioType == 1) {
-            await audioPlayerHelper.initializeAudiosToPlay(
-                1, songIndex, albumId);
-            await audioPlayerHelper.playSongAtIndex(songIndex);
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => const PlayerScreen(),
-              ),
-            );
+            await playerCtrl.initializeAudiosToPlay(1, songIndex, albumId);
+            await playerCtrl.playSongAtIndex(songIndex);
+            routesCtrl.toPlayerScreen();
           } else if (audioType == 2) {
-            await audioPlayerHelper.initializeAudiosToPlay(2, songIndex);
-            await audioPlayerHelper.playSongAtIndex(songIndex);
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => const PlayerScreen(),
-              ),
-            );
+            await playerCtrl.initializeAudiosToPlay(2, songIndex);
+            await playerCtrl.playSongAtIndex(songIndex);
+            routesCtrl.toPlayerScreen();
           } else if (audioType == 4) {
-            await audioPlayerHelper.initializeAudiosToPlay(
+            await playerCtrl.initializeAudiosToPlay(
                 4, songIndex, 0, searchTerm);
-            await audioPlayerHelper.playSongAtIndex(songIndex);
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => const PlayerScreen(),
-              ),
-            );
+            await playerCtrl.playSongAtIndex(songIndex);
+            routesCtrl.toPlayerScreen();
           } else if (audioType == 3) {
-            await audioPlayerHelper.initializeAudiosToPlay(
+            await playerCtrl.initializeAudiosToPlay(
                 3, songIndex, 0, playlistName!);
-            await audioPlayerHelper.playSongAtIndex(songIndex);
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => const PlayerScreen(),
-              ),
-            );
+            await playerCtrl.playSongAtIndex(songIndex);
+            routesCtrl.toPlayerScreen();
           }
         },
       ),
@@ -167,11 +146,11 @@ class SongFile extends StatelessWidget {
               ),
               onPressed: () async {
                 if (!isFavorite) {
-                  await HiveHelper.addToFavorites(id, ctx);
-                  Navigator.of(ctx).pop();
+                  await hiveCtrl.addToFavorites(id);
+                  routesCtrl.goBack();
                 } else {
-                  await HiveHelper.removeFromFavorites(id, buildContext);
-                  Navigator.of(buildContext).pop();
+                  await hiveCtrl.removeFromFavorites(id);
+                  routesCtrl.goBack();
                 }
               },
             ),
@@ -186,7 +165,7 @@ class SongFile extends StatelessWidget {
               ),
               onPressed: () async {
                 await showPlaylists(ctx);
-                Navigator.of(ctx).pop();
+                routesCtrl.goBack();
               },
             ),
           ],
@@ -209,7 +188,7 @@ class SongFile extends StatelessWidget {
             ),
           ),
           content: ValueListenableBuilder<Box<PlaylistBoxModel>>(
-            valueListenable: HiveHelper.getPlaylistsBox().listenable(),
+            valueListenable: hiveCtrl.getPlaylistsBox().listenable(),
             builder: (context, box, _) {
               final lists = box.values.toList().cast<PlaylistBoxModel>();
               if (lists.isEmpty) {
@@ -238,9 +217,9 @@ class SongFile extends StatelessWidget {
                           lists[index].playlistName,
                         ),
                         onPressed: () async {
-                          await HiveHelper.addToPlaylist(
-                              lists[index].playlistName, id, context);
-                          Navigator.of(ctx).pop();
+                          await hiveCtrl.addToPlaylist(
+                              lists[index].playlistName, id);
+                          routesCtrl.goBack();
                         },
                       );
                     },
@@ -252,7 +231,7 @@ class SongFile extends StatelessWidget {
           actions: [
             TextButton.icon(
               onPressed: () {
-                Navigator.of(buildContext).pop();
+                routesCtrl.goBack();
               },
               icon: const Icon(
                 Icons.close,
@@ -296,7 +275,7 @@ class SongFile extends StatelessWidget {
           actions: [
             TextButton.icon(
               onPressed: () {
-                Navigator.of(ct).pop();
+                routesCtrl.goBack();
               },
               icon: const Icon(
                 Icons.close,
@@ -312,8 +291,11 @@ class SongFile extends StatelessWidget {
             ),
             ElevatedButton.icon(
               onPressed: () async {
-                await HiveHelper.deleteFromPlaylist(id, playlistName!, ctx);
-                Navigator.of(ctx).pop();
+                await hiveCtrl.deleteFromPlaylist(
+                  id,
+                  playlistName!,
+                );
+                routesCtrl.goBack();
               },
               icon: const Icon(
                 Icons.delete,

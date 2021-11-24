@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:moozeek_player/helpers/hivebox.dart';
+import 'package:moozeek_player/main.dart';
 import 'package:moozeek_player/models/boxmodels.dart';
 import 'package:moozeek_player/ui/widgets/songfile.dart';
 
@@ -21,7 +22,7 @@ class _FavoritesViewState extends State<FavoritesView> {
         leading: BackButton(
           color: Colors.black,
           onPressed: () {
-            Navigator.of(context).pop();
+            Get.back();
           },
         ),
         title: const Text(
@@ -35,7 +36,7 @@ class _FavoritesViewState extends State<FavoritesView> {
         centerTitle: true,
       ),
       body: ValueListenableBuilder<Box<SongsBoxModel>>(
-        valueListenable: HiveHelper.getSongsBox().listenable(),
+        valueListenable: hiveCtrl.getSongsBox().listenable(),
         builder: (context, box, _) {
           final favSongs = box.values
               .where((song) => song.isFavorite == true)
@@ -49,7 +50,7 @@ class _FavoritesViewState extends State<FavoritesView> {
             );
           } else {
             return RefreshIndicator(
-              onRefresh: HiveHelper.fetchAllSongs,
+              onRefresh: hiveCtrl.fetchAllSongs,
               child: ListView.builder(
                 scrollDirection: Axis.vertical,
                 shrinkWrap: true,

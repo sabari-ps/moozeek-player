@@ -1,6 +1,8 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:moozeek_player/helpers/hivebox.dart';
+import 'package:moozeek_player/main.dart';
 import 'package:moozeek_player/models/boxmodels.dart';
 import 'package:moozeek_player/ui/widgets/songfile.dart';
 
@@ -34,11 +36,11 @@ class PlaylistView extends StatelessWidget {
         ),
       ),
       body: ValueListenableBuilder<Box<PlaylistBoxModel>>(
-        valueListenable: HiveHelper.getPlaylistsBox().listenable(),
+        valueListenable: hiveCtrl.getPlaylistsBox().listenable(),
         builder: (context, box, _) {
           final songs = box.get(playlistName)!.playlistSongsId;
           List<SongsBoxModel> dbSongs =
-              HiveHelper.getSongsBox().values.toList().cast<SongsBoxModel>();
+              hiveCtrl.getSongsBox().values.toList().cast<SongsBoxModel>();
           final viewSongs = <SongsBoxModel>[];
           for (var i = 0; i < songs.length; i++) {
             for (var song in dbSongs) {

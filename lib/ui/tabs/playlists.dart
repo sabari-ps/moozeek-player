@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:moozeek_player/helpers/hivebox.dart';
+import 'package:moozeek_player/main.dart';
 import 'package:moozeek_player/models/boxmodels.dart';
 import 'package:moozeek_player/ui/screens/favorites.dart';
 import 'package:moozeek_player/ui/widgets/playlist_tile.dart';
@@ -62,7 +62,7 @@ class _PlaylistsTabState extends State<PlaylistsTab> {
           ),
         ),
         ValueListenableBuilder<Box<PlaylistBoxModel>>(
-          valueListenable: HiveHelper.getPlaylistsBox().listenable(),
+          valueListenable: hiveCtrl.getPlaylistsBox().listenable(),
           builder: (context, box, _) {
             final playlists = box.values.toList().cast<PlaylistBoxModel>();
             if (playlists.isEmpty) {
@@ -179,14 +179,14 @@ class _PlaylistsTabState extends State<PlaylistsTab> {
   }
 
   Future<void> _createPlaylist(String name, BuildContext ctx) async {
-    if (!HiveHelper.getPlaylistsBox().containsKey(name)) {
-      await HiveHelper.getPlaylistsBox().put(
-        name,
-        PlaylistBoxModel(
-          playlistName: name,
-          playlistSongsId: [],
-        ),
-      );
+    if (!hiveCtrl.getPlaylistsBox().containsKey(name)) {
+      await hiveCtrl.getPlaylistsBox().put(
+            name,
+            PlaylistBoxModel(
+              playlistName: name,
+              playlistSongsId: [],
+            ),
+          );
     } else {
       var snack = const SnackBar(
         content: Text(

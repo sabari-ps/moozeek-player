@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:moozeek_player/helpers/hivebox.dart';
+import 'package:moozeek_player/main.dart';
 import 'package:moozeek_player/models/boxmodels.dart';
 import 'package:moozeek_player/ui/widgets/songfile.dart';
 
@@ -29,7 +30,7 @@ class _AlbumViewState extends State<AlbumView> {
       appBar: AppBar(
         leading: BackButton(
           onPressed: () {
-            Navigator.of(context).pop();
+            Get.back();
           },
           color: Colors.black,
         ),
@@ -45,7 +46,7 @@ class _AlbumViewState extends State<AlbumView> {
         ),
       ),
       body: ValueListenableBuilder<Box<SongsBoxModel>>(
-        valueListenable: HiveHelper.getSongsBox().listenable(),
+        valueListenable: hiveCtrl.getSongsBox().listenable(),
         builder: (context, box, _) {
           final songs = box.values
               .where((song) => song.songAlbumId == widget.albumId)

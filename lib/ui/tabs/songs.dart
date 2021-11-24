@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:moozeek_player/helpers/hivebox.dart';
+import 'package:moozeek_player/main.dart';
 import 'package:moozeek_player/models/boxmodels.dart';
 import 'package:moozeek_player/ui/widgets/songfile.dart';
 
@@ -50,7 +50,7 @@ class _SongsTabState extends State<SongsTab> {
         ),
         (searchingTerm.isEmpty)
             ? ValueListenableBuilder<Box<SongsBoxModel>>(
-                valueListenable: HiveHelper.getSongsBox().listenable(),
+                valueListenable: hiveCtrl.getSongsBox().listenable(),
                 builder: (context, box, _) {
                   final songs = box.values.toList().cast<SongsBoxModel>();
                   songs.sort((a, b) => a.songTitle.compareTo(b.songTitle));
@@ -63,7 +63,7 @@ class _SongsTabState extends State<SongsTab> {
                   } else {
                     return Expanded(
                       child: RefreshIndicator(
-                        onRefresh: HiveHelper.fetchAllSongs,
+                        onRefresh: hiveCtrl.fetchAllSongs,
                         child: ListView.builder(
                           itemCount: songs.length,
                           itemBuilder: (context, index) {
@@ -89,7 +89,7 @@ class _SongsTabState extends State<SongsTab> {
                 },
               )
             : ValueListenableBuilder<Box<SongsBoxModel>>(
-                valueListenable: HiveHelper.getSongsBox().listenable(),
+                valueListenable: hiveCtrl.getSongsBox().listenable(),
                 builder: (context, box, _) {
                   final filtered = box.values
                       .where((song) => song.songTitle

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:moozeek_player/helpers/hivebox.dart';
+import 'package:moozeek_player/main.dart';
 import 'package:moozeek_player/ui/screens/playlist_view.dart';
 
 class PlaylistFile extends StatelessWidget {
   final String playlistName;
   final int songsCount;
-  int id;
-  PlaylistFile({
+  final int id;
+  const PlaylistFile({
     Key? key,
     required this.id,
     required this.playlistName,
@@ -100,7 +100,7 @@ class PlaylistFile extends StatelessWidget {
             ),
             ElevatedButton.icon(
               onPressed: () {
-                HiveHelper.getPlaylistsBox().delete(playlistName);
+                hiveCtrl.getPlaylistsBox().delete(playlistName);
                 Navigator.of(buildContext).pop();
               },
               icon: const Icon(
